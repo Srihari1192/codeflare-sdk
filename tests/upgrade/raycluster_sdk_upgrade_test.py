@@ -19,6 +19,9 @@ local_queue = "local-queue-mnist"
 # Creates a Ray cluster
 class TestMNISTRayClusterUp:
     def setup_method(self):
+        token=run_oc_command(["whoami", "--show-token=true"])
+        server=run_oc_command(["whoami", "--show-server=true"])
+        run_oc_command(["login", "--insecure-skip-tls-verify=True",f"--token={token}" ,f"--server={server}"])
         initialize_kubernetes_client(self)
         create_namespace_with_name(self, namespace)
         try:
@@ -35,13 +38,6 @@ class TestMNISTRayClusterUp:
 
     def run_mnist_raycluster_sdk_oauth(self):
         ray_image = get_ray_image()
-
-        auth = TokenAuthentication(
-            token=run_oc_command(["whoami", "--show-token=true"]),
-            server=run_oc_command(["whoami", "--show-server=true"]),
-            skip_tls=True,
-        )
-        auth.login()
 
         cluster = Cluster(
             ClusterConfiguration(
@@ -83,12 +79,11 @@ class TestMNISTRayClusterUp:
 class TestMnistJobSubmit:
     def setup_method(self):
         initialize_kubernetes_client(self)
-        auth = TokenAuthentication(
-            token=run_oc_command(["whoami", "--show-token=true"]),
-            server=run_oc_command(["whoami", "--show-server=true"]),
-            skip_tls=True,
-        )
-        auth.login()
+
+        token=run_oc_command(["whoami", "--show-token=true"])
+        server=run_oc_command(["whoami", "--show-server=true"])
+        run_oc_command(["login", "--insecure-skip-tls-verify=True",f"--token={token}" ,f"--server={server}"])
+        
         self.namespace = namespace
         self.cluster = get_cluster("mnist", self.namespace)
         if not self.cluster:

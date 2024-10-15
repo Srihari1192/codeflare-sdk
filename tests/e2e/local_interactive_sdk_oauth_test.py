@@ -1,7 +1,6 @@
 from codeflare_sdk import (
     Cluster,
     ClusterConfiguration,
-    TokenAuthentication,
     generate_cert,
 )
 
@@ -15,6 +14,9 @@ from support import *
 @pytest.mark.openshift
 class TestRayLocalInteractiveOauth:
     def setup_method(self):
+        token=run_oc_command(["whoami", "--show-token=true"])
+        server=run_oc_command(["whoami", "--show-server=true"])
+        run_oc_command(["login", "--insecure-skip-tls-verify=True",f"--token={token}" ,f"--server={server}"])
         initialize_kubernetes_client(self)
 
     def teardown_method(self):
@@ -29,13 +31,6 @@ class TestRayLocalInteractiveOauth:
 
     def run_local_interactives(self):
         ray_image = get_ray_image()
-
-        auth = TokenAuthentication(
-            token=run_oc_command(["whoami", "--show-token=true"]),
-            server=run_oc_command(["whoami", "--show-server=true"]),
-            skip_tls=True,
-        )
-        auth.login()
 
         cluster_name = "test-ray-cluster-li"
 

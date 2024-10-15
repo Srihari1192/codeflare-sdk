@@ -2,7 +2,7 @@ import requests
 
 from time import sleep
 
-from codeflare_sdk import Cluster, ClusterConfiguration, TokenAuthentication
+from codeflare_sdk import Cluster, ClusterConfiguration
 from codeflare_sdk.job import RayJobClient
 
 import pytest
@@ -15,6 +15,9 @@ from support import *
 @pytest.mark.openshift
 class TestRayClusterSDKOauth:
     def setup_method(self):
+        token=run_oc_command(["whoami", "--show-token=true"])
+        server=run_oc_command(["whoami", "--show-server=true"])
+        run_oc_command(["login", "--insecure-skip-tls-verify=True",f"--token={token}" ,f"--server={server}"])
         initialize_kubernetes_client(self)
 
     def teardown_method(self):
@@ -30,12 +33,16 @@ class TestRayClusterSDKOauth:
     def run_mnist_raycluster_sdk_oauth(self):
         ray_image = get_ray_image()
 
-        auth = TokenAuthentication(
-            token=run_oc_command(["whoami", "--show-token=true"]),
-            server=run_oc_command(["whoami", "--show-server=true"]),
-            skip_tls=True,
-        )
-        auth.login()
+       
+
+        # auth = TokenAuthentication(
+        #     token=run_oc_command(["whoami", "--show-token=true"]),
+        #     server=run_oc_command(["whoami", "--show-server=true"]),
+        #     skip_tls=True,
+        # )
+        # auth.login()
+
+
 
         cluster = Cluster(
             ClusterConfiguration(
