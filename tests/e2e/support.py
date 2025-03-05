@@ -407,3 +407,12 @@ def assert_get_cluster_and_jobsubmit(
     assert job_list[0].submission_id == submission_id
 
     cluster.down()
+
+
+def get_oc_user_token():
+    """Retrieve OpenShift user token from environment variables."""
+    token = os.environ.get("TEST_USER_TOKEN")
+    if not token:
+        print("Error: USER_TOKEN environment variable is not set.")
+        return None
+    return token

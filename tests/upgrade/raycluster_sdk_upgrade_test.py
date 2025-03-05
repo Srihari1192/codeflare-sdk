@@ -42,7 +42,8 @@ class TestMNISTRayClusterUp:
             skip_tls=True,
         )
         auth.login()
-
+        token = run_oc_command(["whoami"])
+        print(f"Retrieved OpenShift Token: {token}")
         cluster = Cluster(
             ClusterConfiguration(
                 name="mnist",
@@ -84,11 +85,13 @@ class TestMnistJobSubmit:
     def setup_method(self):
         initialize_kubernetes_client(self)
         auth = TokenAuthentication(
-            token=run_oc_command(["whoami", "--show-token=true"]),
+            token=get_oc_user_token(),
             server=run_oc_command(["whoami", "--show-server=true"]),
             skip_tls=True,
         )
         auth.login()
+        token = run_oc_command(["whoami"])
+        print(f"Retrieved OpenShift Token: {token}")
         self.namespace = namespace
         self.cluster = get_cluster("mnist", self.namespace)
         if not self.cluster:
